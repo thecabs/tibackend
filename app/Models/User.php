@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -21,6 +23,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'tel',
+        'role',
+        'etat',
+        'fullName',
+        'permis',
     ];
 
     /**
@@ -42,4 +49,38 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function signalementsRecus(): HasMany {
+        #return $this->belongsToMany(self::class,'signalements','user_id','signaleur_id');
+        return $this->hasMany(Signalement::class);
+    }
+
+    public function signalementsEnvoyes(): HasMany {
+        return $this->hasMany(Signalement::class, "signaleur_id");
+    }
+
+    public function notificationsRecus():HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function notificationsEnvoyees():HasMany
+    {
+        return $this->hasMany(Notification::class, "admin_id");
+    }
+
+
+    public function annonces():HasMany{
+        return $this->hasMany(Annonce::class);
+    }
+
+    public function reservations():HasMany{
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function photos():HasMany{
+        return $this->hasMany(Photo::class);
+    }
+
+
 }

@@ -5,6 +5,7 @@ use Illuminate\Support\ServiceProvider;
 
 return [
 
+    "defaultPassword"=> "password",
     /*
     |--------------------------------------------------------------------------
     | Application Name
