@@ -27,7 +27,8 @@ class AuthController extends Controller
     {
         $request->validate(['email'=>'required|email|unique:users,email',
                                     'tel'=>'string|required|unique:users,tel',
-                                    'name'=>'required|string']);
+                                    'name'=>'required|string',
+                                    'password'=>'required|string']);
 
         $otp = $this->generateOTP();
         $email = $request->email;
@@ -43,6 +44,7 @@ class AuthController extends Controller
             'tel'=>$request->tel,
             'name'=> $request->name,
             'otp' => $otp,
+            'password'=> Hash::make($request->password),
             'expires_at' => Carbon::now()->addMinutes(10) // Expire dans 10 minutes
         ]);
 
@@ -73,25 +75,23 @@ class AuthController extends Controller
             'email'=> $otpRecord->email,
             'name'=> $otpRecord->name,
             'tel'=> $otpRecord->tel,
-            'password'=> Hash::make(config('app.defaultPassword'))
+            'password'=> $otpRecord->password
         ]);
         $otpRecord->delete();
         return response()->json(['message' => 'Authentification réussie']);
     }
 
     public function login(Request $request){
+
         $request->validate(['email'=> 'email|nullable',
                                     'tel'=> 'string|nullable',
-                                    'password'=>'string|nullable']);
+                                    'password'=>'required|string']);
 
         $user=User::where('email', $request->email)
                     ->orWhere('tel',$request->tel)->first();
 
-        if($request->password){
-            $credentials = ["email"=>$user->email,"password"=>$request->password];
-        }else{
-            $credentials = ["email"=>$user->email,"password"=>config('app.defaultPassword')];
-        }
+
+        $credentials = ["email"=>$user->email,"password"=>$request->password];
 
         if (Auth::attempt($credentials)) {
             $user = auth()->user();

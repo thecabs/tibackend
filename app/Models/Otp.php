@@ -15,5 +15,6 @@ class Otp extends Model
         'expires_at',
         'tel',
         'name',
+        'password'
     ];
 }

@@ -17,9 +17,21 @@ class UserControlleur extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->paginate(15);
+        if($request->search){
+            $user = User::latest()->where('name','LIKE','%'.$request->search.'%')
+                                    ->orWhere('email', 'LIKE', '%'.$request->search.'%')
+                                    ->orWhere('tel','LIKE', '%'.$request->search.'%')
+                                    ->orWhere('fullName','LIKE', '%'.$request->search.'%')
+                                    ->orWhere('permis','LIKE', '%'.$request->search.'%')
+                                    ->paginate(15);
+        }
+        elseif($request->role){
+            $users = User::latest()->where('role',$request->role)->paginate(15);
+        }else{
+            $users = User::latest()->where('role','!=',1)->paginate(15);
+        }
         return response()->json(["utilisateurs"=>$users],200);
     }
 
